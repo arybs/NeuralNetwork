@@ -2,7 +2,30 @@ import pickle
 import numpy as np
 from neural_network import NeuralNetwork
 import matplotlib.pyplot as plt
-from sklearn import preprocessing
+#from sklearn import preprocessing
+
+def normalize_data (data: np.ndarray):
+    num_parameters = data[0].size
+    expected_values = np.zeros(num_parameters)
+    variance = np.zeros(num_parameters)
+    number = int(data.size/float(num_parameters))
+    for i in range(number):
+        for j in range(num_parameters):
+            expected_values[j] += data[i][j]/float(number)
+    
+    for i in range(number):
+        for j in range(num_parameters):
+            variance[j] += ((data[i][j] - expected_values[j])**2)/float(number)
+    
+    for i in range(number):
+        for j in range(num_parameters):
+            if (variance[j] != 0):
+                data[i][j] = (data[i][j] - expected_values[j])/(variance[j]**(0.5))
+            else:
+                data[i][j] = 0 
+
+
+
 
 if __name__ == "__main__":
     # open data
@@ -23,9 +46,9 @@ if __name__ == "__main__":
 
     # just basic things
     # normalization goes like this x =  (x-mean(x))/std(x)
-    train_data = train_data/255
+    normalize_data(train_data[:100])
     print(train_data[0])
-    n = NeuralNetwork(train_data[0].size, 10, 100)
-    ret = n.stochastic_gradient(train_data[:1000], train_labels[:1000])
-    plt.plot(np.linspace(0, 999, 1000)[:10], ret[:10])
-    plt.show()
+    #n = NeuralNetwork(train_data[0].size, 10, 100)
+    #ret = n.stochastic_gradient(train_data[:1000], train_labels[:1000])
+    #plt.plot(np.linspace(0, 999, 1000)[:10], ret[:10])
+    #plt.show()
