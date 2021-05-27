@@ -33,9 +33,9 @@ class NeuralNetwork:
         self.output_layer = None
         self.hidden_layer = None
         # TODO: Check how weights should be generated at first
-        self.weights_first = 2 * (np.random.random([hidden_layer_size + 1, numbers_of_params + 1]) - 0.5) * np.sqrt(
+        self.weights_first = 2 * (np.random.random([hidden_layer_size + 1, numbers_of_params + 1]) - 0.5) * 1 / np.sqrt(
             numbers_of_params)
-        self.weights_second = 2 * (np.random.random([number_of_labels, hidden_layer_size + 1]) - 0.5) * np.sqrt(
+        self.weights_second = 2 * (np.random.random([number_of_labels, hidden_layer_size + 1]) - 0.5) * 1 / np.sqrt(
             hidden_layer_size)
 
     def count_values_in_layers(self):
@@ -68,22 +68,23 @@ class NeuralNetwork:
     def gradient_hidden_layers(self, expected_result):
         temp = np.zeros(self.output_layer.size)
         temp[expected_result] = 1
-        dq_dy1 = np.matmul((2 * (self.output_layer - expected_result)), self.weights_second)  # vector
+        dq_dy1 = np.matmul((2 * (self.output_layer - temp)), self.weights_second)  # vector
         dq_ds = dq_dy1 * activation_function_derivative(np.matmul(self.weights_first, self.first_layer.T))  # vector
         return np.outer(dq_ds, self.first_layer)
 
     def stochastic_gradient(self, train_data: np.ndarray, train_expected: np.ndarray):
         # TODO podobno to sie oplaca robic jako losowanie ze zwracaniem tych probek, ale kiedy to konczyc? Chyba dziala tak, ze my 'udajemy ze to losujemy'
         # ale pewnosci nie mam.
-        beta = 1  # staly krok można zmienić
+        beta = 0.5  # staly krok można zmienić
         temp = []
         for iter in range(train_data.shape[0]):
             self.set_value_in_first_layer(train_data[iter])
             self.count_values_in_layers()
-            self.weights_second -= beta * self.gradient_output_layer(int(train_expected[iter]))
-            # pytanie: Jeśli dobrze rozumiem w metodzie wstecznej propagacji jest tak ze najpierw oblcizmy gradient
-            # warstw ostatnich i potem gradienty ukrtych zalezy od tych wag dalszych, tylko przed czy po aktualizacji
-            self.weights_first -= beta * self.gradient_hidden_layers(int(train_expected[iter]))
+            grad_output = self.gradient_output_layer(int(train_expected[iter]))
+            # self.output_layer = self.output_layer/(np.max(self.output_layer)-np.min(self.output_layer))
+            grad_hidden = self.gradient_hidden_layers(int(train_expected[iter]))
+            self.weights_second -= beta * grad_output
+            self.weights_first -= beta * grad_hidden
             temp.append(self.count_cost_function(int(train_expected[iter])))
         return temp
 
