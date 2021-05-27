@@ -1,6 +1,6 @@
 import pickle
 import numpy as np
-
+from neural_network import NeuralNetwork
 if __name__ == "__main__":
     # open data
     with open("./mnist.pkl", "rb") as f:
@@ -13,4 +13,13 @@ if __name__ == "__main__":
     # all data are stored in np.arrays, check NumPy documentation
     print(train_data.shape)  # shape
     print(train_data[0])  # show data
+
+
+    train_labels = data["training_labels"]
+
     # just basic things
+    n = NeuralNetwork(train_data[0].size, 10, 100)
+    n.stochastic_gradient(train_data[:100], train_labels[:100])
+
+    
+

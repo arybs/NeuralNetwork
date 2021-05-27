@@ -27,17 +27,14 @@ i zobacz czy cos lepiej ocenia
 # 2 layer version
 
 class NeuralNetwork:
-    def do_sth(self):
-        pass
-
     def __init__(self, numbers_of_params: int, number_of_labels: int, hidden_layer_size: int):
         # do przemyslenia uogolnienie + czy potrzebna taka inicjalizacja
         self.first_layer = None
         self.output_layer = None
         self.hidden_layer = None
         # TODO: Check how weights should be generated at first
-        self.weights_first = np.random.random([hidden_layer_size + 1, numbers_of_params + 1])
-        self.weights_second = np.random.random([number_of_labels, hidden_layer_size + 1])
+        self.weights_first = np.random.random([hidden_layer_size + 1, numbers_of_params + 1]) - 0.5
+        self.weights_second = np.random.random([number_of_labels, hidden_layer_size + 1]) - 0.5
 
     def count_values_in_layers(self):
         self.hidden_layer = activation_function(np.matmul(self.weights_first, self.first_layer.T))
@@ -76,13 +73,13 @@ class NeuralNetwork:
         #TODO podobno to sie oplaca robic jako losowanie ze zwracaniem tych probek, ale kiedy to konczyc? Chyba dziala tak, ze my 'udajemy ze to losujemy'
         # ale pewnosci nie mam.
         beta = 0.2 # staly krok można zmienić
-        for iter in range(train_data.size):
+        for iter in range(train_data.shape[0]):
             self.set_value_in_first_layer(train_data[iter])
             self.count_values_in_layers()
-            self.weights_second -= beta*self.gradient_output_layer(train_expected[iter])
+            self.weights_second -= beta*self.gradient_output_layer(int(train_expected[iter]))
             # pytanie: Jeśli dobrze rozumiem w metodzie wstecznej propagacji jest tak ze najpierw oblcizmy gradient
             # warstw ostatnich i potem gradienty ukrtych zalezy od tych wag dalszych, tylko przed czy po aktualizacji
-            self.weights_first -= beta*self.gradient_hidden_layers(train_expected[iter])
+            self.weights_first -= beta*self.gradient_hidden_layers(int(train_expected[iter]))
     def classify(self, data):
         '''
         Do only after stochastic_gradient!!!
@@ -93,7 +90,7 @@ class NeuralNetwork:
         self.count_values_in_layers()
         return np.argmax(self.output_layer)
 
-
+'''
 
 # let's test
 
@@ -109,3 +106,4 @@ print(nn.count_cost_function(2))
 #print(nn.weights_second - nn.gradient_output_layer(2))
 
 print(nn.gradient_hidden_layers(1) )
+'''
