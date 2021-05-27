@@ -36,6 +36,7 @@ if __name__ == "__main__":
     print(data.keys())
     # to get train data for example
     train_data = data["training_images"]
+    train_data = train_data/ 255
     # all data are stored in np.arrays, check NumPy documentation
     print(train_data.shape)  # shape
     print(train_data[0])  # show data
@@ -46,14 +47,24 @@ if __name__ == "__main__":
 
     # just basic things
     # normalization goes like this x =  (x-mean(x))/std(x)
-    normalize_data(train_data[:100])
-    print(train_data[0])
+    #normalize_data(train_data[:100])
+    #print(train_data[0])
 
-    n = NeuralNetwork(train_data[0].size, 10, 100)
-    ret = n.stochastic_gradient(train_data[:10000], train_labels[:10000])
-    x = np.linspace(0, 9999, 10000)
-    x = x[::1000]
-    y = ret[::1000]
+    n = NeuralNetwork(train_data[0].size, 10, 30)
+    #ret = n.stochastic_gradient(train_data[:10000], train_labels[:10000])
+    #x = np.linspace(0, 9999, 10000)
+    #x = x[::1000]
+    #y = ret[::1000]
+    #print(y)
     #plt.plot(np.linspace(0, 999, 1000)[:100], ret[:100])
-    plt.plot(x, y)
-    plt.show()
+    #plt.plot(x, y)
+    #plt.show()
+    n.train(train_data[:10000], train_labels[:10000], epochs=500)
+    counter = 0
+    whole = 0
+    for i in range(train_data[:10000].shape[0]):
+        if n.classify(train_data[i]) == train_labels[i]:
+            counter += 1
+        whole += 1
+    print(counter/whole)
+

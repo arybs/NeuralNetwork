@@ -4,6 +4,14 @@ import numpy as np
 def logistic_function(x):
     return 1. / (np.exp(-x) + 1)
 
-def logistic_function_derivative(x):
-    return logistic_function(x)*(1-logistic_function(x))
 
+def logistic_function_derivative(x):
+    return logistic_function(x) * (1 - logistic_function(x))
+
+
+def ReLU(x):
+    return np.maximum(0, x)
+
+
+def ReLU_derivative(x):
+    return np.array([1 if elem > 0 else 0 for elem in x])

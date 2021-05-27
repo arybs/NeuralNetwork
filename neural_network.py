@@ -1,10 +1,12 @@
 import numpy as np
 import activation_functions
-
+from sklearn.utils import shuffle
 # define activation_functions
 activation_function = activation_functions.logistic_function
 activation_function_derivative = activation_functions.logistic_function_derivative
 
+activation_function = activation_functions.ReLU
+activation_function_derivative = activation_functions.ReLU_derivative
 '''
 Notatki:
 ogólnie na razie stworzony jest pereptorn dwuwarstowy warto by zrobic go jednak n-warstwowym
@@ -23,16 +25,16 @@ i zobacz czy cos lepiej ocenia
 
 '''
 
-
+epochs_number = int(1e6)
 # 2 layer version
 
 class NeuralNetwork:
     def __init__(self, numbers_of_params: int, number_of_labels: int, hidden_layer_size: int):
-        # do przemyslenia uogolnienie + czy potrzebna taka inicjalizacja
+        # TODO make it for n hidden layers
         self.first_layer = None
         self.output_layer = None
         self.hidden_layer = None
-        # TODO: Check how weights should be generated at first
+
         self.weights_first = 2 * (np.random.random([hidden_layer_size + 1, numbers_of_params + 1]) - 0.5) * 1 / np.sqrt(
             numbers_of_params)
         self.weights_second = 2 * (np.random.random([number_of_labels, hidden_layer_size + 1]) - 0.5) * 1 / np.sqrt(
@@ -77,16 +79,26 @@ class NeuralNetwork:
         # ale pewnosci nie mam.
         beta = 0.5  # staly krok można zmienić
         temp = []
-        for iter in range(train_data.shape[0]):
-            self.set_value_in_first_layer(train_data[iter])
-            self.count_values_in_layers()
-            grad_output = self.gradient_output_layer(int(train_expected[iter]))
-            # self.output_layer = self.output_layer/(np.max(self.output_layer)-np.min(self.output_layer))
-            grad_hidden = self.gradient_hidden_layers(int(train_expected[iter]))
-            self.weights_second -= beta * grad_output
-            self.weights_first -= beta * grad_hidden
-            temp.append(self.count_cost_function(int(train_expected[iter])))
-        return temp
+        try:
+            for iter in range(train_data.shape[0]):
+                self.set_value_in_first_layer(train_data[iter])
+                self.count_values_in_layers()
+                grad_output = self.gradient_output_layer(int(train_expected[iter]))
+                # self.output_layer = self.output_layer/(np.max(self.output_layer)-np.min(self.output_layer))
+                grad_hidden = self.gradient_hidden_layers(int(train_expected[iter]))
+                self.weights_second -= beta * grad_output
+                self.weights_first -= beta * grad_hidden
+                temp.append(self.count_cost_function(int(train_expected[iter])))
+            return temp
+        except Exception as e:
+            print(f"{e.__class__}exception occured")
+            print(iter)
+
+    def train(self, train_data: np.ndarray, train_label: np.ndarray, epochs: int = epochs_number):
+        for _ in range(epochs):
+            to_train_data, to_train_label = shuffle(train_data, train_label)
+            self.stochastic_gradient(to_train_data, to_train_label)
+            print(_/epochs*100)
 
     def classify(self, data):
         '''
@@ -94,9 +106,9 @@ class NeuralNetwork:
         :param data: data to classify
         :return: result
         '''
-        self.first_layer(data)
+        self.set_value_in_first_layer(data)
         self.count_values_in_layers()
-        return np.argmax(self.output_layer)
+        return np.argmin(abs(1-self.output_layer))
 
 
 '''
