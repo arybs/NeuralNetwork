@@ -6,8 +6,8 @@ from sklearn.utils import shuffle
 activation_function = activation_functions.logistic_function
 activation_function_derivative = activation_functions.logistic_function_derivative
 
-activation_function = activation_functions.ReLU
-activation_function_derivative = activation_functions.ReLU_derivative
+# activation_function = activation_functions.ReLU
+# activation_function_derivative = activation_functions.ReLU_derivative
 '''
 Notatki:
 ogólnie na razie stworzony jest pereptorn dwuwarstowy warto by zrobic go jednak n-warstwowym
@@ -71,7 +71,6 @@ class NeuralNetwork:
                     np.matmul(self.weights[iter], self.hidden_layers[iter - 1].T))
             self.hidden_layers[iter][-1] = 1
 
-
         self.output_layer = np.matmul(self.weights[-1], self.hidden_layers[-1].T)
 
     def set_value_in_first_layer(self, values: np.ndarray):
@@ -93,23 +92,26 @@ class NeuralNetwork:
             res_grad = []
             temp = np.zeros(self.output_layer.size)
             temp[expected_result] = 1
-            y_temp = self.output_layer - temp
+            y_temp = 2 * (self.output_layer - temp)
             res_grad.append(np.outer(y_temp, self.hidden_layers[-1]))
-            for iter in range(len(self.hidden_layers)-1, 0, -1):
-                y_temp = np.matmul(y_temp, self.weights[iter+1])  # vector
+            for iter in range(len(self.hidden_layers) - 1, 0, -1):
+                y_temp = np.matmul(y_temp, self.weights[iter + 1])  # vector
                 dq_ds = y_temp * activation_function_derivative(
-                    np.matmul(self.weights[iter], self.hidden_layers[iter-1].T))  # vector
-                res_grad.append(np.outer(dq_ds, self.hidden_layers[iter-1]))
+                    np.matmul(self.weights[iter], self.hidden_layers[iter - 1].T))  # vector
+                res_grad.append(np.outer(dq_ds, self.hidden_layers[iter - 1]))
 
-            y_temp = np.matmul(y_temp, self.weights[1])  # vector
-            dq_ds = y_temp * activation_function_derivative(np.matmul(self.weights[0], self.first_layer.T))  # vector
+            # y_temp = np.matmul(y_temp, self.weights[1])  # vector
+            # dq_ds = y_temp * activation_function_derivative(np.matmul(self.weights[0], self.first_layer.T))  # vector
+            dq_dy1 = np.matmul((2 * (self.output_layer - temp)), self.weights[1])  # vector
+            dq_ds = dq_dy1 * activation_function_derivative(np.matmul(self.weights[0], self.first_layer.T))  # vector
             res_grad.append(np.outer(dq_ds, self.first_layer))
             res_grad.reverse()
             return res_grad
         except Exception as e:
             print(f"{e.__class__}exception occured")
+
     def stochastic_gradient(self, train_data: np.ndarray, train_expected: np.ndarray):
-        beta = 0.01  # staly krok można zmienić
+        beta = 0.001  # staly krok można zmienić
         temp = []
         try:
             for iter in range(train_data.shape[0]):
@@ -117,13 +119,13 @@ class NeuralNetwork:
                 self.count_values_in_layers()
                 gradient = self.gradient(int(train_expected[iter]))
                 for iter in range(len(gradient)):
-                    self.weights[iter] -= beta*gradient[iter]
+                    self.weights[iter] -= beta * gradient[iter]
 
-                #grad_output = self.gradient_output_layer(int(train_expected[iter]))
+                # grad_output = self.gradient_output_layer(int(train_expected[iter]))
                 # self.output_layer = self.output_layer/(np.max(self.output_layer)-np.min(self.output_layer))
-                #grad_hidden = self.gradient_hidden_layers(int(train_expected[iter]))
-                #self.weights_second -= beta * grad_output
-                #self.weights_first -= beta * grad_hidden
+                # grad_hidden = self.gradient_hidden_layers(int(train_expected[iter]))
+                # self.weights_second -= beta * grad_output
+                # self.weights_first -= beta * grad_hidden
                 temp.append(self.count_cost_function(int(train_expected[iter])))
             return temp
         except Exception as e:
@@ -166,64 +168,3 @@ print(nn.count_cost_function(2))
 
 print(nn.gradient_hidden_layers(1) )
 '''
-
-nn = NeuralNetwork(3, 2, [4], 1)
-
-a = np.array([3,1,-4])
-b = np.array([0,0])
-
-nn.set_value_in_first_layer(a)
-print("First layer\n")
-print(nn.first_layer)
-print("First weights\n")
-print(nn.weights[0])
-nn.count_values_in_layers()
-print("hidden layer\n")
-print(nn.hidden_layers[0])
-print("second weights\n")
-print(nn.weights[1])
-print("output layer\n")
-print(nn.output_layer)
-#grad_output = nn.gradient_output_layer(1)
-grad = nn.gradient(1)
-grad_output = grad[0]
-print("grad_output\n")
-print(grad_output)
-#grad_hidden = nn.gradient_hidden_layers(1)
-grad_hidden = grad_output[1]
-print("grad_hidden\n")
-print(grad_hidden)
-temp = np.zeros(nn.output_layer.size)
-temp[1] = 1
-ret = np.linalg.norm(temp - nn.output_layer)
-print(ret)
-
-c1 = []
-c3 = []
-text = []
-ex = 0 ;
-for i in range(2):
-    for j in range(4):
-        if ( i == 1):
-            ex = 1
-        else:
-            ex = 0
-        c1.append(2*nn.output_layer[i]*nn.hidden_layers[0][j])
-        if (2*(nn.output_layer[i]- ex)*nn.hidden_layers[0][j] == grad_output[i][j]):
-            text.append("ok")
-        else:
-            text.append("error")
-
-
-
-dqdy1 = 2*nn.output_layer[0]*nn.weights[1][0,0] + 2*(nn.output_layer[1]-1)*nn.weights[1][1,0]
-dqds1 = dqdy1 * activation_function_derivative(nn.weights[0][0,0]*nn.first_layer[0]+nn.weights[0][0,1]*nn.first_layer[1]+nn.weights[0][0,2]*nn.first_layer[2]+nn.weights[0][0,3]*nn.first_layer[3])
-
-c3 = dqds1*nn.first_layer[0]
-
-print(c1)
-
-print(c3)
-print(text)
-
-
