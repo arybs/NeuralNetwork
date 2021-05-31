@@ -50,7 +50,8 @@ if __name__ == "__main__":
     #normalize_data(train_data[:100])
     #print(train_data[0])
 
-    n = NeuralNetwork(train_data[0].size, 10, 30)
+    #n = NeuralNetwork(train_data[0].size, 10, 100)
+    n = NeuralNetwork(train_data[0].size, 10, [100], 1)
     #ret = n.stochastic_gradient(train_data[:10000], train_labels[:10000])
     #x = np.linspace(0, 9999, 10000)
     #x = x[::1000]
@@ -59,10 +60,10 @@ if __name__ == "__main__":
     #plt.plot(np.linspace(0, 999, 1000)[:100], ret[:100])
     #plt.plot(x, y)
     #plt.show()
-    n.train(train_data[:10000], train_labels[:10000], epochs=500)
+    n.train(train_data[:1000], train_labels[:1000], epochs=500)
     counter = 0
     whole = 0
-    for i in range(train_data[:10000].shape[0]):
+    for i in range(train_data[:1000].shape[0]):
         if n.classify(train_data[i]) == train_labels[i]:
             counter += 1
         whole += 1
