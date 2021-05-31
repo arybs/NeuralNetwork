@@ -77,7 +77,7 @@ class NeuralNetwork:
     def stochastic_gradient(self, train_data: np.ndarray, train_expected: np.ndarray):
         # TODO podobno to sie oplaca robic jako losowanie ze zwracaniem tych probek, ale kiedy to konczyc? Chyba dziala tak, ze my 'udajemy ze to losujemy'
         # ale pewnosci nie mam.
-        beta = 0.5  # staly krok można zmienić
+        beta = 0.01  # staly krok można zmienić
         temp = []
         try:
             for iter in range(train_data.shape[0]):
@@ -97,8 +97,9 @@ class NeuralNetwork:
     def train(self, train_data: np.ndarray, train_label: np.ndarray, epochs: int = epochs_number):
         for _ in range(epochs):
             to_train_data, to_train_label = shuffle(train_data, train_label)
-            self.stochastic_gradient(to_train_data, to_train_label)
-            print(_/epochs*100)
+            temp = self.stochastic_gradient(to_train_data, to_train_label)
+            print(_/epochs*100, f"\tCost {np.mean(temp)}")
+
 
     def classify(self, data):
         '''
