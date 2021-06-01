@@ -15,7 +15,7 @@ def ReLU(x):
 
 def ReLU_derivative(x):
     if isinstance(x, np.float):
-        if x>0:
+        if x > 0:
             return 1
         else:
             return 0
