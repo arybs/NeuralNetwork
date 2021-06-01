@@ -136,6 +136,7 @@ class NeuralNetwork:
         print("Calculations started")
         for _ in range(epochs):
             to_train_data, to_train_label = shuffle(train_data, train_label)
+            
             if do_batches:
                 ret = self.stochastic_gradient_with_mini_batches(to_train_data, to_train_label, batch_size)
             else:
@@ -144,6 +145,7 @@ class NeuralNetwork:
             if _ % 10 == 0 or epochs < 100:
                 print(_ / epochs * 100)
                 print("Cost:\t", np.mean(np.array(ret)))
+
 
     def classify(self, data):
         """

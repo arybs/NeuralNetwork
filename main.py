@@ -22,6 +22,7 @@ if __name__ == "__main__":
 
     n = NeuralNetwork(train_data[0].size, 10, [100, 50], 2)
     n.train(train_data, train_labels, epochs=5, do_batches=True)
+
     counter = 0
     whole = 0
     for i in range(train_data.shape[0]):
