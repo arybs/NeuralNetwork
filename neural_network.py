@@ -4,24 +4,21 @@ from sklearn.utils import shuffle
 from typing import List
 
 # define activation_functions
-activation_function = activation_functions.logistic_function
-activation_function_derivative = activation_functions.logistic_function_derivative
+activation_function_name = "ReLU"
 
-activation_function = activation_functions.ReLU
-activation_function_derivative = activation_functions.ReLU_derivative
+if activation_function_name == "Logistic function":
+    activation_function = activation_functions.logistic_function
+    activation_function_derivative = activation_functions.logistic_function_derivative
+elif activation_function_name == "ReLU":
+    activation_function = activation_functions.ReLU
+    activation_function_derivative = activation_functions.ReLU_derivative
 
-epochs_number = int(1e3)
+epochs_number = 100
+
 beta = 0.01
+
 beta_batch = 0.1
 
-'''
-Problem klasyfikacji, oczekujemy na wyjścia wektora samych zer z jedną jedynka (oznaczająca label), do którego klasyfikujemy zdjęcie
-Siec jako argument przyjmuje ilosc parametrow na wyjsciu, ilosc kategorii na wyjsciu + liczba ukrytych warstw + lista z iloscia 
-neuronow w ukrytych warstwach
-'''
-
-
-# 2 layer version
 
 class NeuralNetwork:
     def __init__(self, numbers_of_params: int, number_of_labels: int, hidden_layer_sizes: List[int],
@@ -92,6 +89,12 @@ class NeuralNetwork:
             print(f"{e.__class__}exception occured")
 
     def stochastic_gradient(self, train_data: np.ndarray, train_expected: np.ndarray):
+        '''
+
+        :param train_data:
+        :param train_expected:
+        :return: lista obliczonych funkcji kosztu dla kazdej probki
+        '''
         temp = []
         try:
             for iter in range(train_data.shape[0]):
@@ -136,7 +139,7 @@ class NeuralNetwork:
         print("Calculations started")
         for _ in range(epochs):
             to_train_data, to_train_label = shuffle(train_data, train_label)
-            
+
             if do_batches:
                 ret = self.stochastic_gradient_with_mini_batches(to_train_data, to_train_label, batch_size)
             else:
@@ -146,10 +149,9 @@ class NeuralNetwork:
                 print(_ / epochs * 100)
                 print("Cost:\t", np.mean(np.array(ret)))
 
-
     def classify(self, data):
         """
-        Do only after stochastic_gradient!!!
+        Do only after train
         :param data: data to classify
         :return: result
         """
