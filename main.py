@@ -17,7 +17,7 @@ numbers_of_layers = 2
 layers_list = [40, 40]
 beta_to_save = beta_batch
 epochs_params = 10
-batch_size = 10
+batch_size = 100
 
 if __name__ == "__main__":
     # open data
@@ -33,24 +33,32 @@ if __name__ == "__main__":
     test_data = data["test_images"]
     test_data = test_data / 255
 
-    if os.path.exists("./Wyniki.csv"):
-        df = pd.read_csv("./Wyniki.csv")
-    else:
-        df = pd.DataFrame(columns=columns_names)
+    intervals = [0.001,0.1,0.25,0.7, 1]
+    for i in range (len(intervals)):
+        beta_batch = intervals[i]
+        beta_to_save = beta_batch
+        print("Start")
+        print("Beta:")
+        print(beta_batch)
+        if os.path.exists("./Wyniki.csv"):
+            df = pd.read_csv("./Wyniki.csv")
+        else:
+            df = pd.DataFrame(columns=columns_names)
 
-    n = NeuralNetwork(train_data[0].size, 10, layers_list, numbers_of_layers)
+        n = NeuralNetwork(train_data[0].size, 10, layers_list, numbers_of_layers)
 
-    # show validation example
-    res = k_cross_validation(train_data, train_labels, n, epochs=epochs_params, batch_size=batch_size)
+        # show validation example
+        res = k_cross_validation(train_data, train_labels, n, epochs=epochs_params, batch_size=batch_size)
 
-    to_append = [activation_function_name, epochs_params, beta_to_save, batch_size, numbers_of_layers, layers_list, res]
-    t = pd.Series(to_append, index=df.columns)
-    df = df.append(t, ignore_index=True)
+        to_append = [activation_function_name, epochs_params, beta_to_save, batch_size, numbers_of_layers, layers_list, res]
+        t = pd.Series(to_append, index=df.columns)
+        df = df.append(t, ignore_index=True)
 
-    df.to_csv("./Wyniki.csv", index=False)
-
-    print("Dopasowanie:")
-    print(res)
+        df.to_csv("./Wyniki.csv", index=False)
+        print("Batch size:")
+        print(beta_batch)
+        print("Dopasowanie:")
+        print(res)
 
     '''
     n.train(train_data, train_labels, epochs=5, do_batches=True)
